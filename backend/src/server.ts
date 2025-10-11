@@ -37,5 +37,15 @@ app.post("/register", async (req, res) => {
     const user = await prisma.user.create({data: { ...data, password: hashed } });
     res.json(user);
 });
+app.post("/login", async (req, res) => {
+    const {email, password} = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({ message: "Email ou senha inválido" });
+    }
+    const token = jwt.sign({id: user.id}, JWT_SECRET,);
+    res.json({ token });
+
+});
 
 app.listen(4000, () => console.log("Servidor rodando na porta 4000"));
