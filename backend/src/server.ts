@@ -5,13 +5,23 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
+
 const app = express();
 const prisma = new PrismaClient();
 app.use(express.json());
 app.use(cors());
 
+// Allow attaching `userId` to requests without TypeScript errors.
+declare global {
+    namespace Express {
+        interface Request {
+            userId?: number;
+        }
+    }
+}
 const JWT_SECRET = "admin123";
 
+// Authentication Middleware
 function auth(req: any, res: any, next: any) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -26,6 +36,7 @@ function auth(req: any, res: any, next: any) {
         return res.status(401).json({ message: "Token inválido" });
     }
 }
+// register
 app.post("/register", async (req, res) => {
     const schema = z.object({
         name: z.string().min(3),
@@ -37,6 +48,7 @@ app.post("/register", async (req, res) => {
     const user = await prisma.user.create({data: { ...data, password: hashed } });
     res.json(user);
 });
+// login
 app.post("/login", async (req, res) => {
     const {email, password} = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
@@ -45,6 +57,25 @@ app.post("/login", async (req, res) => {
     }
     const token = jwt.sign({id: user.id}, JWT_SECRET,);
     res.json({ token });
+
+});
+// Creates a user message and generates an immediate AI reply.
+app.post("/message", auth, async (req, res) => {
+    const { content } = req.body;
+    if (typeof req.userId !== "number") {
+        return res.status(400).json({ message: "Usuário não autenticado." });
+    }
+    const message = await prisma.message.create({
+        data: { content, userId: req.userId },
+    });
+    const reply = await prisma.message.create({
+        data: {
+            content: "Olá, sou a Eliza! Você falou: " + content,
+            fromIA: true,
+            userId: req.userId,
+        },
+    });
+    res.json({ message, reply });
 
 });
 
