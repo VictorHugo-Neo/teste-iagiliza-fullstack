@@ -1,35 +1,32 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import axios from 'axios'
+import { LoginScreen } from './components/LoginScreen' // import login screen component
 
-function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+const API = "http://localhost:4000"; // conect server backend
+
+function App(){ // main app function
+  const [token, setToken] = useState<string | null>(null); // state to store auth token
+  async function login(email: string, password: string){
+    try{ 
+      const res = await axios.post(`${API}/login`, {email, password});
+      console.log("Token:", res.data.token); // browser log test
+      setToken(res.data.token);
+    } catch(error){ // error handling
+      console.error('Login failed', error);
+      alert("Falha no Login. Verifique o console")
+    }
+  }
+
+  if(!token){ // if no token, show login screen
+    return <LoginScreen onLogin={login} />
+  }
+  return ( // if token exists, show token
+      <div style={{padding:20}}>
+        <h2>Login bem-sucedido!</h2>
+        <p>Token de autenticação é: </p>
+        <p style ={{wordBreak: "break-all"}}>{token}</p> // display token with word break for long strings
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
 }
-
-export default App
+export default App;
