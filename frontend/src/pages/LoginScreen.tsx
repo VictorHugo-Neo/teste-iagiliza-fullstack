@@ -58,6 +58,15 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                     >
                         ENTRAR
                     </button>
+                    <p>Não tem uma conta?
+                        <button
+                            type="button"
+                            onClick={() => window.location.href = "https://www.google.com/"}
+                            className="text-blue-500 hover:underline"
+                        >
+                            Cadastre-se
+                        </button>
+                    </p>
                 </form>
             </main>
             <Footer /> {/* Footer component */}

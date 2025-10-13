@@ -1,13 +1,20 @@
-import { useState } from 'react'
-import axios from 'axios'
-import { LoginScreen } from './pages/LoginScreen' // import login screen component
+//import { useState } from 'react'
+//import axios from 'axios'
+//import { LoginScreen } from './pages/LoginScreen' // import login screen component
+import { RegisterScreen } from './pages/RegisterScreen' // import register screen component
 
 
-
-const API = "http://localhost:4000"; // conect server backend
+//const API = "http://localhost:4000"; // conect server backend
 
 function App(){ // main app function
-  const [token, setToken] = useState<string | null>(null); // state to store auth token
+  return(
+    <RegisterScreen />
+  )
+  
+  
+  
+  
+  /*const [token, setToken] = useState<string | null>(null); // state to store auth token
   async function login(email: string, password: string){
     try{ 
       const res = await axios.post(`${API}/login`, {email, password});
@@ -29,5 +36,7 @@ function App(){ // main app function
         <p style ={{wordBreak: "break-all"}}>{token}</p> // display token with word break for long strings
       </div>
     );
+  */
+
 }
 export default App;
