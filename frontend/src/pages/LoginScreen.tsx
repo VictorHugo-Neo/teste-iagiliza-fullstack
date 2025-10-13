@@ -1,0 +1,66 @@
+import { useState } from 'react';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+
+interface LoginScreenProps {
+    onLogin: (email: string, password: string) => void;
+}
+// LoginScreen component with email and password inputs
+export function LoginScreen({ onLogin }: LoginScreenProps) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLoginClick = () => {
+        onLogin(email, password);
+    };
+
+    
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault(); // Prevent form submission 
+        handleLoginClick();
+    };
+    return (
+        <div className="flex flex-col min-h-screen bg-gray-100">
+            <Header /> {/* Header component */}
+            <main className="flex-grow flex items-center justify-center p-4">
+                {/* Login form container */}
+                <form 
+                    onSubmit={handleSubmit}
+                    className="bg-orange-500 p-8 rounded-lg shadow-md w-full max-w-sm"
+                >
+                    <h2 className="text-3xl font-bold text-white text-center mb-6">
+                        LOGIN
+                    </h2>
+                    
+                    <div className="space-y-4">
+                        {/* Email input field */}
+                        <input
+                            className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            placeholder='Digite seu email'
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                        {/* Password input field */}
+                        <input
+                            className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            placeholder='Digite sua senha'
+                            type='password'
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button 
+                        type="submit"
+                        className="w-full mt-6 px-4 py-2 font-bold text-orange-500 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                        ENTRAR
+                    </button>
+                </form>
+            </main>
+            <Footer /> {/* Footer component */}
+        </div>
+    );
+}

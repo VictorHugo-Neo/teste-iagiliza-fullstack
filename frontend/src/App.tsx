@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import axios from 'axios'
-import { LoginScreen } from './components/LoginScreen' // import login screen component
+import { LoginScreen } from './pages/LoginScreen' // import login screen component
+
 
 
 const API = "http://localhost:4000"; // conect server backend
