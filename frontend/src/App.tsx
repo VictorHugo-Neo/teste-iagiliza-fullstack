@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { LoginScreen } from "./pages/LoginScreen"; // import login screen component
 import { RegisterScreen } from "./pages/RegisterScreen"; // import register screen component
+import { ChatScreen } from "./pages/ChatScreen"; // import chat screen component
 import { api } from "./services/api";
 
 type RegisterFormData = {
@@ -12,18 +13,13 @@ type RegisterFormData = {
 };
 
 function App() {
-  // main app function
-
-  const [token, setToken] = useState<string | null>(() =>
-    localStorage.getItem("authToken")
-  ); // state to hold auth token
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("authToken")); // state to hold auth token
   const [showRegister, setShowRegister] = useState(false); // state to toggle between login and register screens
 
   async function login(email: string, password: string) {
     try {
       const res = await api.post("/login", { email, password });
       const receivedToken = res.data.token; // get token from response
-
       localStorage.setItem("authToken", receivedToken); // store token in local storage
       setToken(receivedToken);
     } catch (error) {
@@ -57,14 +53,18 @@ function App() {
     }
   }
 
-  if (token) {
-    // if token exists, user is logged in
-    return (
-      <div style={{ padding: 20 }}>
-        <h2>Login bem-sucedido!</h2>
-      </div>
-    );
+  // function to handle user logout
+  function logout() {
+    localStorage.removeItem("authToken"); // remove token from local storage
+    setToken(null); // clear token from state
+    toast.success("Você foi desconectado.");
   }
+
+  if (token) {
+    // if token exists, user is logged in, so render the ChatScreen
+    return <ChatScreen onLogout={logout} />;
+  }
+
   return (
     <>
       <Toaster position="top-right" />
