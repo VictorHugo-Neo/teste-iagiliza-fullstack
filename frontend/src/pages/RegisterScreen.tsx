@@ -4,13 +4,14 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { z } from 'zod'; // library for schema validation
 import { zodResolver } from '@hookform/resolvers/zod';
 
+
 // Validetion schema using Zod
 const registerSchema = z.object({
     name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres.'),
     email: z.string().email('Por favor, insira um email válido.'),
     password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
     confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
+}).refine(data => data.password === data.confirmPassword, { // custom validation to check if passwords match
     message: "As senhas não coincidem.",
     path: ["confirmPassword"],
 });
@@ -18,20 +19,23 @@ const registerSchema = z.object({
 // Infer the form data type from the schema
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-export function RegisterScreen() { // Main Register Screen component
+interface RegisterScreenProps {
+    onRegister: (data: RegisterFormData) => void; // Função que receberá os dados válidos
+    onSwitchToLogin: () => void;
+}
+export function RegisterScreen({ onRegister}: RegisterScreenProps) { // Main Register Screen component
 
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema)
     });
 
     const handleRegister: SubmitHandler<RegisterFormData> = (data) => {
-        console.log("DADOS VÁLIDOS:", data);
-        alert("Formulário válido e enviado! Verifique o console."); // Alert for successful submission
+        onRegister(data); // Entrega os dados validados para o App.tsx
     };
 
     return ( // Page layout with Header, main form, and Footer
         <div className="flex flex-col min-h-screen bg-light text-light">
-            <Header />
+            <Header/>
             <main className="flex-grow flex items-center justify-center p-4">
                 <div className="bg-secondary w-full max-w-md p-8 rounded-lg shadow-xl">
                     <h2 className="text-light text-3xl font-bold text-center mb-6">
@@ -71,7 +75,7 @@ export function RegisterScreen() { // Main Register Screen component
                             <input
                                 type="password"
                                 placeholder="Confirme sua senha"
-                                {...register('confirmPassword')}
+                                {...register('confirmPassword')} // Register the confirmPassword field
                                 className="w-full px-4 py-2 text-dark bg-light rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
                             />
                             {errors.confirmPassword && <p className="text-danger mt-1 text-sm">{errors.confirmPassword.message}</p>}

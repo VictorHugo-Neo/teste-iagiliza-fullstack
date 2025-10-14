@@ -4,17 +4,16 @@ import { Footer } from '../components/Footer';
 
 interface LoginScreenProps {
     onLogin: (email: string, password: string) => void;
+    onSwitchToRegister: () => void;
 }
 // LoginScreen component with email and password inputs
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLoginClick = () => {
         onLogin(email, password);
     };
-
-
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault(); // Prevent form submission 
         handleLoginClick();
@@ -61,7 +60,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                     <p>Não tem uma conta?
                         <button
                             type="button"
-                            onClick={() => window.location.href = "https://www.google.com/"}
+                            onClick={onSwitchToRegister} // Switch to registration screen
                             className="text-blue-500 hover:underline"
                         >
                             Cadastre-se
