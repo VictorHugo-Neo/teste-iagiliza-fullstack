@@ -19,22 +19,22 @@ export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
         handleLoginClick();
     };
     return (
-        <div className="flex flex-col min-h-screen bg-gray-100">
+        <div className="flex flex-col min-h-screen bg-light">
             <Header /> {/* Header component */}
             <main className="flex-grow flex items-center justify-center p-4">
                 {/* Login form container */}
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-orange-500 p-8 rounded-lg shadow-md w-full max-w-sm"
+                    className="bg-secondary p-8 rounded-lg shadow-md w-full max-w-sm"
                 >
-                    <h2 className="text-3xl font-bold text-white text-center mb-6">
+                    <h2 className="text-3xl font-bold text-light text-center mb-6">
                         LOGIN
                     </h2>
 
                     <div className="space-y-4">
                         {/* Email input field */}
                         <input
-                            className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="w-full px-4 py-2 text-dark bg-light rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
                             placeholder='Digite seu email'
                             type="email"
                             value={email}
@@ -43,7 +43,7 @@ export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
                         />
                         {/* Password input field */}
                         <input
-                            className="w-full px-4 py-2 text-gray-700 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
+                            className="w-full px-4 py-2 text-dark bg-light rounded-md focus:outline-none focus:ring-2 focus:ring-orange-300"
                             placeholder='Digite sua senha'
                             type='password'
                             value={password}
@@ -53,7 +53,7 @@ export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
                     </div>
                     <button
                         type="submit"
-                        className="w-full mt-6 px-4 py-2 font-bold text-orange-500 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                        className="w-full mt-6 px-4 py-2 font-bold text-secondary bg-light rounded-md hover:bg-gray-200 transition-colors"
                     >
                         ENTRAR
                     </button>
@@ -61,7 +61,7 @@ export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
                         <button
                             type="button"
                             onClick={onSwitchToRegister} // Switch to registration screen
-                            className="text-blue-500 hover:underline"
+                            className="text-primary hover:underline"
                         >
                             Cadastre-se
                         </button>
