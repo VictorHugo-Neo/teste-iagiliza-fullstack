@@ -29,54 +29,73 @@ function auth(req: any, res: any, next: any) {
     }
     const [, token] = authHeader.split(" ");
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as {id: number};
+        const decoded = jwt.verify(token, JWT_SECRET) as { id: number };
         req.userId = decoded.id;
         next();
-    }catch {
+    } catch {
         return res.status(401).json({ message: "Token inválido" });
     }
 }
 // register
 app.post("/register", async (req, res) => {
-    const schema = z.object({
-        name: z.string().min(3),
-        email: z.string().email(),
-        password: z.string().min(6),
-    });
-    const data = schema.parse(req.body);
-    const hashed = await bcrypt.hash(req.body.password, 10);
-    const user = await prisma.user.create({data: { ...data, password: hashed } });
-    res.json(user);
+    try {
+        const schema = z.object({
+            name: z.string().min(3),
+            email: z.string().email(),
+            password: z.string().min(6),
+        });
+        const data = schema.parse(req.body);
+        const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
+        if (existingUser) {
+            return res.status(409).json({ message: "Este email já está em uso." });
+        }
+        const hashed = await bcrypt.hash(data.password, 10);
+        const user = await prisma.user.create({ data: { ...data, password: hashed } });
+        res.status(201).json(user); // return created user (without password)
+    } catch (error) {
+        res.status(400).json({ message: "Dados inválidos.", details: error }); // Bad Request
+    }
 });
 // login
 app.post("/login", async (req, res) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(401).json({ message: "Email ou senha inválido" });
     }
-    const token = jwt.sign({id: user.id}, JWT_SECRET,);
+    const token = jwt.sign({ id: user.id }, JWT_SECRET,);
     res.json({ token });
 
 });
-// Creates a user message and generates an immediate AI reply.
+// Get all messages for the authenticated user
+app.get("/messages", auth, async (req, res) => {
+    const messages = await prisma.message.findMany({
+        where: { userId: req.userId },
+        orderBy: { createdAt: 'asc' },
+    });
+    res.json(messages);
+});
+
+
+// Post a new message and get an automated reply
 app.post("/message", auth, async (req, res) => {
     const { content } = req.body;
-    if (typeof req.userId !== "number") {
+    const userId = req.userId;
+
+    if (typeof userId !== "number") { // should never happen due to auth middleware
         return res.status(400).json({ message: "Usuário não autenticado." });
     }
     const message = await prisma.message.create({
-        data: { content, userId: req.userId },
+        data: { content, userId },
     });
-    const reply = await prisma.message.create({
+    const reply = await prisma.message.create({ // Simulated AI reply
         data: {
-            content: "Olá, sou a Eliza! Você falou: " + content,
+            content: "Olá, sou a Liza! Você falou: " + content,
             fromIA: true,
-            userId: req.userId,
+            userId,
         },
     });
-    res.json({ message, reply });
-
+    res.status(201).json({ message, reply });
 });
 
 app.listen(4000, () => console.log("Servidor rodando na porta 4000"));
