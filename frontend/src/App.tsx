@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import axios from 'axios'
 import toast, { Toaster } from 'react-hot-toast';
 import { LoginScreen } from './pages/LoginScreen' // import login screen component
 import { RegisterScreen } from './pages/RegisterScreen' // import register screen component
+import { api } from './services/api';
 
-
-const API = "http://localhost:4000"; // conect server backend
 
 type RegisterFormData = {
   name: string;
@@ -21,7 +19,7 @@ function App() { // main app function
 
   async function login(email: string, password: string) {
     try {
-      const res = await axios.post(`${API}/login`, { email, password });
+      const res = await api.post('/login', { email, password });
       console.log("Token:", res.data.token); // browser log test
       setToken(res.data.token);
     } catch (error) { // error handling
@@ -40,7 +38,7 @@ function App() { // main app function
         password: data.password
       };
 
-      await axios.post(`${API}/register`, submitData); // send registration data to backend
+      await api.post('/register', submitData); ; // send registration data to backend
 
       toast.success('Cadastro realizado com sucesso! Faça o login.', { id: loadingToast });
       setShowRegister(false); // Volta para a tela de login após o sucesso
