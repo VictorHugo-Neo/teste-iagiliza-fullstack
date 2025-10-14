@@ -52,6 +52,16 @@ function App() {
       });
     }
   }
+  async function registerUser(data: RegisterFormData) {
+    const loadingToast = toast.loading('Criando sua conta...');
+
+    try {
+      // Prepare data to send, excluding confirmPassword
+      const submitData = {
+        name: data.name,
+        email: data.email,
+        password: data.password
+      };
 
   // function to handle user logout
   function logout() {
