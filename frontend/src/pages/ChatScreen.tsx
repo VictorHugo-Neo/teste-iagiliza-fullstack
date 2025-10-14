@@ -8,7 +8,7 @@ type ChatScreenProps = { // eslint-disable-line no-unused-vars
 
 export function ChatScreen({ onLogout }: ChatScreenProps) {
   return (
-    <div className="flex flex-col min-h-screen bg-dark text-light">
+    <div className="flex flex-col min-h-screen bg-light text-dark">
       <Header onLogout={onLogout} /> {/* Header component with logout functionality */}
       <main className="flex-grow flex items-center justify-center p-4">
         <ChatWindow /> {/* ChatWindow component */}

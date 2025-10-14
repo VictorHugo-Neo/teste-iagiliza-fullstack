@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { FormEvent } from "react";
 import { api } from "../../services/api";
 
@@ -16,7 +16,7 @@ export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { // Fetch messages from the backend API
     async function fetchMessages() {
       try {
@@ -30,6 +30,9 @@ export function ChatWindow() {
     }
     fetchMessages();
   }, []);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); // Scroll to the bottom when messages change
+  }, [messages]);
   async function handleSendMessage(event: FormEvent) {
     event.preventDefault();
     if (newMessage.trim() === "") return;
@@ -65,6 +68,8 @@ export function ChatWindow() {
             </div>
           ))
         )}
+        {/* 3. Adicionar o elemento invisível no final da lista */}
+        <div ref={messagesEndRef} />
       </main>
       <footer className="p-4 bg-dark">
         <form onSubmit={handleSendMessage} className="flex items-center bg-light rounded-full px-2">
