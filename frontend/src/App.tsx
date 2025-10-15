@@ -4,6 +4,7 @@ import { LoginScreen } from "./pages/LoginScreen"; // import login screen compon
 import { RegisterScreen } from "./pages/RegisterScreen"; // import register screen component
 import { ChatScreen } from "./pages/ChatScreen"; // import chat screen component
 import { EditProfileScreen } from './pages/EditProfileScreen'; // import edit profile screen component
+import { LandingPage } from './pages/LandingPage'; // import landing page component
 import { api } from "./services/api";
 
 type RegisterFormData = {
@@ -17,6 +18,8 @@ function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("authToken")); // state to hold auth token
   const [showRegister, setShowRegister] = useState(false); // state to toggle between login and register screens
   const [activeScreen, setActiveScreen] = useState<'chat' | 'editProfile'>('chat');
+  
+  const [publicView, setPublicView] = useState<'landing' | 'login' | 'register'>('landing');
   async function login(email: string, password: string) {
     try {
       const res = await api.post("/login", { email, password });
@@ -67,28 +70,37 @@ function App() {
       <Toaster position="top-right" />
 
       {token ? (
-
+        // --- SE O USUÁRIO ESTÁ LOGADO, mostra a área privada ---
+        // Esta parte não muda.
         <>
           {activeScreen === 'chat' && (
-            <ChatScreen
-              onLogout={logout}
-              onNavigateToEditProfile={() => setActiveScreen('editProfile')}
-            />
+            <ChatScreen onLogout={logout} onNavigateToEditProfile={() => setActiveScreen('editProfile')} />
           )}
           {activeScreen === 'editProfile' && (
-            <EditProfileScreen
-              onLogout={logout}
-              onNavigateToChat={() => setActiveScreen('chat')}
-            />
+            <EditProfileScreen onLogout={logout} onNavigateToChat={() => setActiveScreen('chat')} />
           )}
         </>
       ) : (
-
+        // --- SE O USUÁRIO NÃO ESTÁ LOGADO, mostra a área pública ---
+        // 3. Esta é a nova lógica de navegação pública
         <>
-          {showRegister ? ( // toggle between login and register screens
-            <RegisterScreen onRegister={registerUser} onSwitchToLogin={() => setShowRegister(false)} />
-          ) : (
-            <LoginScreen onLogin={login} onSwitchToRegister={() => setShowRegister(true)} />
+          {publicView === 'landing' && (
+            <LandingPage 
+              onNavigateToLogin={() => setPublicView('login')}
+              onNavigateToRegister={() => setPublicView('register')}
+            />
+          )}
+          {publicView === 'login' && (
+            <LoginScreen 
+              onLogin={login}
+              onSwitchToRegister={() => setPublicView('register')}
+            />
+          )}
+          {publicView === 'register' && (
+            <RegisterScreen 
+              onRegister={registerUser}
+              onSwitchToLogin={() => setPublicView('login')}
+            />
           )}
         </>
       )}

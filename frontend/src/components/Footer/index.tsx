@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
         <footer className="relative bg-dark p-8">
             <div>
                 <span className="text-primary text-lg font-bold">
-                    LIZA ia
+                    LIZA
                 </span>
             </div>
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
