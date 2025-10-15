@@ -6,6 +6,9 @@ import { Footer } from '../components/Footer';
 import { Header } from '../components/Header';
 import { api } from '../services/api';
 
+// Import icons for the password visibility toggle
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+
 type UserData = { // Define the UserData type
     name: string;
     email: string;
@@ -28,6 +31,8 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    // Add state to manage password visibility
+    const [showPassword, setShowPassword] = useState(false);
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -125,7 +130,6 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
             <Header
                 variant='private-edit' // Use the private-edit variant
                 onLogout={onLogout}
-                onNavigateToEditProfile={() => { }}
             />
             {/* Main content area */}
             <main className="flex-grow flex flex-col items-center p-4">
@@ -141,12 +145,12 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                             <form onSubmit={handleUpdateData} className="p-4 border-t border-dark flex flex-col gap-4">
                                 <div>
                                     <label htmlFor="name" className=" font-semibold text-light">Nome (atual: {userData?.name})</label>
-                                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o novo nome" className="w-full p-2 mt-1 rounded bg-light text-lightText" />
+                                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o novo nome" className="w-full p-2 mt-1 rounded text-dark bg-light" />
                                     {errors.name && <p className="text-dark text-sm mt-1">{errors.name}</p>}
                                 </div>
                                 <div>
                                     <label htmlFor="email" className=" font-semibold text-light">Email (atual: {userData?.email})</label>
-                                    <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Digite o novo email" className="w-full p-2 mt-1 rounded bg-light text-lightText" />
+                                    <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Digite o novo email" className="w-full p-2 mt-1 rounded text-dark bg-light" />
                                 </div>
                                 <button type="submit" className="bg-dark text-light font-bold py-2 px-4 rounded-lg hover:bg-primary transition-colors self-end">
                                     Salvar
@@ -162,21 +166,54 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                         </button>
                         {activeSection === 'password' && (
                             <form onSubmit={handleChangePassword} className="p-4 border-t border-secondary flex flex-col gap-4">
-                                <div>
+                                {/* Current Password Field with visibility toggle */}
+                                <div className="relative">
                                     <label htmlFor="currentPassword" className=" font-semibold text-light">Senha Atual</label>
-                                    <input type="password" id="currentPassword" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" className="w-full p-2 mt-1 rounded bg-light text-lightText" />
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        id="currentPassword"
+                                        value={currentPassword}
+                                        onChange={e => setCurrentPassword(e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full p-2 mt-1 rounded text-dark bg-light pr-10"
+                                    />
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute bottom-1 right-0 flex items-center pr-3 text-gray-500">
+                                        {showPassword ? <EyeSlashIcon className="h-5 w-5 text-lightText" /> : <EyeIcon className="h-5 w-5 text-lightText" />}
+                                    </button>
                                 </div>
-                                <div>
+                                {/* New Password Field with visibility toggle */}
+                                <div className="relative">
                                     <label htmlFor="newPassword" className="font-semibold text-light">Nova Senha</label>
-                                    <input type="password" id="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Mínimo de 6 caracteres" className="w-full p-2 mt-1 rounded bg-light text-lightText" />
-                                    {errors.newPassword && <p className="text-secondary text-sm mt-1">{errors.newPassword}</p>}
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        id="newPassword"
+                                        value={newPassword}
+                                        onChange={e => setNewPassword(e.target.value)}
+                                        placeholder="Mínimo de 6 caracteres"
+                                        className="w-full p-2 mt-1 rounded text-dark bg-light pr-10"
+                                    />
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute bottom-1 right-0 flex items-center pr-3 text-gray-500">
+                                        {showPassword ? <EyeSlashIcon className="h-5 w-5 text-lightText" /> : <EyeIcon className="h-5 w-5 text-lightText" />}
+                                    </button>
                                 </div>
-                                <div>
+                                {errors.newPassword && <p className="text-secondary text-sm -mt-3">{errors.newPassword}</p>}
+                                {/* Confirm New Password Field with visibility toggle */}
+                                <div className="relative">
                                     <label htmlFor="confirmPassword" className="font-semibold text-light">Confirmar Nova Senha</label>
-                                    <input type="password" id="confirmPassword" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Repita a nova senha" className="w-full p-2 mt-1 rounded  bg-light text-lightText" />
-                                    {errors.confirmPassword && <p className="text-secondary text-sm mt-1">{errors.confirmPassword}</p>}
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        id="confirmPassword"
+                                        value={confirmPassword}
+                                        onChange={e => setConfirmPassword(e.target.value)}
+                                        placeholder="Repita a nova senha"
+                                        className="w-full p-2 mt-1 rounded text-dark bg-light pr-10"
+                                    />
+                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute bottom-1 right-0 flex items-center pr-3 text-gray-500">
+                                        {showPassword ? <EyeSlashIcon className="h-5 w-5 text-lightText" /> : <EyeIcon className="h-5 w-5 text-lightText" />}
+                                    </button>
                                 </div>
-                                <button type="submit" className="bg-secondary text-light font-bold py-2 px-4 rounded-lg hover:bg-primary  transition-colors self-end ">
+                                {errors.confirmPassword && <p className="text-secondary text-sm -mt-3">{errors.confirmPassword}</p>}
+                                <button type="submit" className="bg-secondary text-light font-bold py-2 px-4 rounded-lg hover:bg-primary transition-colors self-end ">
                                     Alterar Senha
                                 </button>
                             </form>
@@ -185,7 +222,6 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                     <button onClick={onNavigateToChat} className=" text-1xl font-bold mt-8 text-secondary hover:underline hover:text-primary mx-auto block">Voltar para o Chat</button>
                 </div>
             </main>
-
             <Footer />
         </div>
     );
