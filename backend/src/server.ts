@@ -145,7 +145,7 @@ app.post("/message", { preHandler: [auth] }, async (request, reply) => {
 // Get current user info
 app.get("/me", { preHandler: [auth] }, async (request, reply) => {
   const user = await prisma.user.findUnique({
-    // 📍 ALTERATION: Changed req.userId to request.userId
+    
     where: { id: request.userId! },
     select: { id: true, name: true, email: true }, // exclude password
   });

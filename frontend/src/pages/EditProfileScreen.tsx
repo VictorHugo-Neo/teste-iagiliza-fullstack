@@ -145,12 +145,12 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                             <form onSubmit={handleUpdateData} className="p-4 border-t border-dark flex flex-col gap-4">
                                 <div>
                                     <label htmlFor="name" className=" font-semibold text-light">Nome (atual: {userData?.name})</label>
-                                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o novo nome" className="w-full p-2 mt-1 rounded bg-light text-lightText" />
+                                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o novo nome" className="w-full p-2 mt-1 rounded bg-light text-dark" />
                                     {errors.name && <p className="text-dark text-sm mt-1">{errors.name}</p>}
                                 </div>
                                 <div>
                                     <label htmlFor="email" className=" font-semibold text-light">Email (atual: {userData?.email})</label>
-                                    <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Digite o novo email" className="w-full p-2 mt-1 rounded bg-light text-lightText" />
+                                    <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Digite o novo email" className="w-full p-2 mt-1 rounded bg-light text-dark" />
                                 </div>
                                 <button type="submit" className="bg-dark text-light font-bold py-2 px-4 rounded-lg hover:bg-primary transition-colors self-end">
                                     Salvar
@@ -175,7 +175,7 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                                         value={currentPassword}
                                         onChange={e => setCurrentPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full p-2 mt-1 rounded bg-light text-lightText pr-10"
+                                        className="w-full p-2 mt-1 rounded bg-light text-dark pr-10"
                                     />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute bottom-1 right-0 flex items-center pr-3 text-gray-500">
                                         {showPassword ? <EyeSlashIcon className="h-5 w-5 text-lightText" /> : <EyeIcon className="h-5 w-5 text-lightText" />}
@@ -190,7 +190,7 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                                         value={newPassword}
                                         onChange={e => setNewPassword(e.target.value)}
                                         placeholder="Mínimo de 6 caracteres"
-                                        className="w-full p-2 mt-1 rounded bg-light text-lightText pr-10"
+                                        className="w-full p-2 mt-1 rounded bg-light text-dark pr-10"
                                     />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute bottom-1 right-0 flex items-center pr-3 text-gray-500">
                                         {showPassword ? <EyeSlashIcon className="h-5 w-5 text-lightText" /> : <EyeIcon className="h-5 w-5 text-lightText" />}
@@ -206,7 +206,7 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
                                         value={confirmPassword}
                                         onChange={e => setConfirmPassword(e.target.value)}
                                         placeholder="Repita a nova senha"
-                                        className="w-full p-2 mt-1 rounded bg-light text-lightText pr-10"
+                                        className="w-full p-2 mt-1 rounded bg-light text-dark pr-10"
                                     />
                                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute bottom-1 right-0 flex items-center pr-3 text-gray-500">
                                         {showPassword ? <EyeSlashIcon className="h-5 w-5 text-lightText" /> : <EyeIcon className="h-5 w-5 text-lightText" />}
