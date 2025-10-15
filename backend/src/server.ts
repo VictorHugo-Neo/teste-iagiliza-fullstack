@@ -31,6 +31,7 @@ declare module 'fastify' {
     interface FastifyRequest {
         userId: number | null;
     }
+  }
 }
 
 
@@ -50,6 +51,11 @@ const auth = async (request: FastifyRequest, reply: FastifyReply) => {
     } catch (err) {
         return reply.code(401).send({ message: "Token inválido" });
     }
+    throw new Error("Formato de token inválido");
+    next();
+  } catch {
+    return res.status(401).json({ message: "Token inválido" });
+  }
 }
 
 // register
