@@ -23,19 +23,19 @@ interface RegisterScreenProps {
     onRegister: (data: RegisterFormData) => void; // Função que receberá os dados válidos
     onSwitchToLogin: () => void;
 }
-export function RegisterScreen({ onRegister}: RegisterScreenProps) { // Main Register Screen component
+export function RegisterScreen({ onRegister }: RegisterScreenProps) { // Main Register Screen component
 
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema)
     });
 
     const handleRegister: SubmitHandler<RegisterFormData> = (data) => {
-        onRegister(data); // Entrega os dados validados para o App.tsx
+        onRegister(data); // Call the onRegister prop with valid data
     };
 
     return ( // Page layout with Header, main form, and Footer
         <div className="flex flex-col min-h-screen bg-light text-light">
-            <Header/>
+            <Header />
             <main className="flex-grow flex items-center justify-center p-4">
                 <div className="bg-secondary w-full max-w-md p-8 rounded-lg shadow-xl">
                     <h2 className="text-light text-3xl font-bold text-center mb-6">
