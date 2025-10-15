@@ -3,7 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { LoginScreen } from "./pages/LoginScreen"; // import login screen component
 import { RegisterScreen } from "./pages/RegisterScreen"; // import register screen component
 import { ChatScreen } from "./pages/ChatScreen"; // import chat screen component
-import { EditProfileScreen } from './pages/EditProfileScreen';
+import { EditProfileScreen } from './pages/EditProfileScreen'; // import edit profile screen component
 import { api } from "./services/api";
 
 type RegisterFormData = {
@@ -45,7 +45,7 @@ function App() {
       toast.success("Cadastro realizado com sucesso! Faça o login.", {
         id: loadingToast,
       });
-      setShowRegister(false); // Volta para a tela de login após o sucesso
+      setShowRegister(false); // switch to login screen after successful registration
     } catch (error) {
       console.error("Falha no cadastro:", error);
       toast.error("Erro ao criar conta. Tente outro email.", {
@@ -61,40 +61,36 @@ function App() {
     toast.success("Você foi desconectado.");
   }
 
-  if (token) {
-    // Se o usuário estiver logado, decidimos qual tela mostrar
-    return (
-      <>
-        {activeScreen === 'chat' && (
-          <ChatScreen 
-            onLogout={logout} 
-            // Passamos uma função para mudar o estado para 'editProfile'
-            onNavigateToEditProfile={() => setActiveScreen('editProfile')} 
-          />
-        )}
-        {activeScreen === 'editProfile' && (
-          <EditProfileScreen 
-            onLogout={logout} 
-            // Passamos uma função para mudar o estado de volta para 'chat'
-            onNavigateToChat={() => setActiveScreen('chat')}
-          />
-        )}
-      </>
-    )
-  }
   return (
     <>
+      {/* Toast notifications container */}
       <Toaster position="top-right" />
-      {showRegister ? ( // toggle between login and register screens
-        <RegisterScreen
-          onRegister={registerUser}
-          onSwitchToLogin={() => setShowRegister(false)}
-        />
+
+      {token ? (
+
+        <>
+          {activeScreen === 'chat' && (
+            <ChatScreen
+              onLogout={logout}
+              onNavigateToEditProfile={() => setActiveScreen('editProfile')}
+            />
+          )}
+          {activeScreen === 'editProfile' && (
+            <EditProfileScreen
+              onLogout={logout}
+              onNavigateToChat={() => setActiveScreen('chat')}
+            />
+          )}
+        </>
       ) : (
-        <LoginScreen // login screen component
-          onLogin={login}
-          onSwitchToRegister={() => setShowRegister(true)}
-        />
+
+        <>
+          {showRegister ? ( // toggle between login and register screens
+            <RegisterScreen onRegister={registerUser} onSwitchToLogin={() => setShowRegister(false)} />
+          ) : (
+            <LoginScreen onLogin={login} onSwitchToRegister={() => setShowRegister(true)} />
+          )}
+        </>
       )}
     </>
   );
