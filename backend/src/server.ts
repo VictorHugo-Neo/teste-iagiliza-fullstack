@@ -11,14 +11,16 @@ const app = fastify({ logger: true }); // Initialize Fastify
 const prisma = new PrismaClient();
 
 app.register(cors, {
-    origin: '*', // For production, you should restrict this
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 });
 
 
 const secretFromEnv = process.env.JWT_SECRET;
 if (!secretFromEnv) { // Check if JWT_SECRET is defined
   console.error("ERRO FATAL: A variável de ambiente JWT_SECRET não está definida.");
-  process.exit(1); 
+  process.exit(1);
 }
 const JWT_SECRET: string = secretFromEnv; // Now TypeScript knows this is a string
 
@@ -28,28 +30,28 @@ interface TokenPayload {
 
 app.decorate('userId', null);
 declare module 'fastify' {
-    interface FastifyRequest {
-        userId: number | null;
-    }
+  interface FastifyRequest {
+    userId: number | null;
+  }
 }
 
 
 const auth = async (request: FastifyRequest, reply: FastifyReply) => {
-    const authHeader = request.headers.authorization;
-    if (!authHeader) {
-        return reply.code(401).send({ message: "Token ausente" });
+  const authHeader = request.headers.authorization;
+  if (!authHeader) {
+    return reply.code(401).send({ message: "Token ausente" });
+  }
+  const [, token] = authHeader.split(" ");
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (typeof decoded === 'object' && 'id' in decoded) {
+      request.userId = (decoded as TokenPayload).id;
+    } else {
+      throw new Error("Formato de token inválido");
     }
-    const [, token] = authHeader.split(" ");
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        if (typeof decoded === 'object' && 'id' in decoded) {
-            request.userId = (decoded as TokenPayload).id;
-        } else {
-            throw new Error("Formato de token inválido");
-        }
-    } catch (err) {
-        return reply.code(401).send({ message: "Token inválido" });
-    }
+  } catch (err) {
+    return reply.code(401).send({ message: "Token inválido" });
+  }
 }
 
 // register
@@ -60,19 +62,19 @@ app.post("/register", async (request, reply) => {
       email: z.string().email(),
       password: z.string().min(6),
     });
-    
+
     const data = schema.parse(request.body);
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
     if (existingUser) {
-      
+
       return reply.code(409).send({ message: "Este email já está em uso." });
     }
     const hashed = await bcrypt.hash(data.password, 10);
     const user = await prisma.user.create({ data: { ...data, password: hashed } });
-    
+
     reply.code(201).send(user); // return created user (without password)
   } catch (error) {
-    
+
     reply.code(400).send({ message: "Dados inválidos.", details: error }); // Bad Request
   }
 });
@@ -80,15 +82,15 @@ app.post("/register", async (request, reply) => {
 
 // login
 app.post("/login", async (request, reply) => {
-  
+
   const { email, password } = request.body as any;
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    
+
     return reply.code(401).send({ message: "Email ou senha inválido" });
   }
   const token = jwt.sign({ id: user.id }, JWT_SECRET,);
-  
+
   reply.send({ token });
 });
 
@@ -96,20 +98,20 @@ app.post("/login", async (request, reply) => {
 // Get all messages for the authenticated user
 app.get("/messages", { preHandler: [auth] }, async (request, reply) => {
   const messages = await prisma.message.findMany({
-    
+
     where: { userId: request.userId! },
     orderBy: { createdAt: 'asc' },
   });
-  
+
   reply.send(messages);
 });
 
 
 // Post a new message and get an automated reply
 app.post("/message", { preHandler: [auth] }, async (request, reply) => {
-  
+
   const { content } = request.body as any;
-  
+
   const userId = request.userId!;
 
   if (typeof userId !== "number") { // should never happen due to auth middleware
@@ -135,7 +137,7 @@ app.post("/message", { preHandler: [auth] }, async (request, reply) => {
       userId,
     },
   });
-  
+
   reply.code(201).send({ message, reply: aiReply });
 });
 
@@ -143,7 +145,7 @@ app.post("/message", { preHandler: [auth] }, async (request, reply) => {
 // Get current user info
 app.get("/me", { preHandler: [auth] }, async (request, reply) => {
   const user = await prisma.user.findUnique({
-    // 📍 ALTERATION: Changed req.userId to request.userId
+    
     where: { id: request.userId! },
     select: { id: true, name: true, email: true }, // exclude password
   });
@@ -174,7 +176,21 @@ app.put("/user", { preHandler: [auth] }, async (request, reply) => {
     });
     reply.send(updatedUser);
   } catch (error) {
-    reply.code(400).send({ message: "Dados inválidos." });
+    // Enhanced error handling
+    console.error("ERRO AO ATUALIZAR USUÁRIO:", error);
+
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return reply.code(400).send({
+        message: "Dados de entrada inválidos.",
+        errors: error.flatten().fieldErrors,
+      });
+    }
+
+    // Handle unique constraint violation (e.g., email already in use)
+    return reply.code(500).send({
+      message: "Ocorreu um erro interno ao tentar atualizar o usuário.",
+    });
   }
 });
 
@@ -207,11 +223,11 @@ app.put("/user/password", { preHandler: [auth] }, async (request, reply) => {
 });
 
 const start = async () => {
-    try {
-        await app.listen({ port: 4000 });
-    } catch (err) {
-        app.log.error(err);
-        process.exit(1);
-    }
+  try {
+    await app.listen({ port: 4000 });
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
 };
 start();
