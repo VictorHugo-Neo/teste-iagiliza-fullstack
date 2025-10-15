@@ -4,12 +4,13 @@ import { ChatWindow } from "../components/Chat/ChatWindow";
 
 type ChatScreenProps = { // eslint-disable-line no-unused-vars
   onLogout: () => void;
+  onNavigateToEditProfile: () => void;
 };
 
-export function ChatScreen({ onLogout }: ChatScreenProps) {
+export function ChatScreen({ onLogout, onNavigateToEditProfile }: ChatScreenProps) {
   return (
     <div className="flex flex-col min-h-screen bg-light text-dark">
-      <Header onLogout={onLogout} /> {/* Header component with logout functionality */}
+      <Header onLogout={onLogout} onNavigateToEditProfile={onNavigateToEditProfile} /> {/* Header component with logout functionality */}
       <main className="flex-grow flex items-center justify-center p-4">
         <ChatWindow /> {/* ChatWindow component */}
       </main>
