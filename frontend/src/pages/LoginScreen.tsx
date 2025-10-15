@@ -20,7 +20,10 @@ export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
     };
     return (
         <div className="flex flex-col min-h-screen bg-light">
-            <Header /> {/* Header component */}
+            <Header
+                variant="public-login"
+                onNavigateToRegister={onSwitchToRegister}
+            />
             <main className="flex-grow flex items-center justify-center p-4">
                 {/* Login form container */}
                 <form

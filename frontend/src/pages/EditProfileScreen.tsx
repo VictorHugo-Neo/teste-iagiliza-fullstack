@@ -122,7 +122,11 @@ export function EditProfileScreen({ onLogout, onNavigateToChat }: EditProfileScr
     // Render component
     return (
         <div className="flex flex-col min-h-screen bg-light">
-            <Header onLogout={onLogout} onNavigateToEditProfile={() => { }} />
+            <Header
+                variant='private-edit' // Use the private-edit variant
+                onLogout={onLogout}
+                onNavigateToEditProfile={() => { }}
+            />
             {/* Main content area */}
             <main className="flex-grow flex flex-col items-center p-4">
                 <div className="w-full max-w-2xl mt-12">
