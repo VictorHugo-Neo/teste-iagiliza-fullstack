@@ -18,13 +18,21 @@ const ProtectedRoute = ({ token }: { token: string | null }) => {
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  return <Outlet />; // <Outlet /> renderiza o componente filho da rota (Chat ou Perfil)
+  return <Outlet />; // Renders the protected route component (Chat or EditProfile)
 };
+
+
+const PublicOnlyRoute = ({ token }: { token: string | null }) => {
+  if (token) {
+    return <Navigate to="/chat" replace />;
+  }
+  return <Outlet />; // Renders the public route component (Landing, Login, or Register)
+};
+
 function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("authToken")); // state to hold auth token
   const navigate = useNavigate();
-  // state to toggle between login and register screens
-  
+
 
   async function login(email: string, password: string) {
     try {
@@ -77,12 +85,14 @@ function App() {
     <>
       <Toaster position="top-right" />
       <Routes>
-        {/* --- Rotas Públicas --- */}
-        <Route path="/" element={<LandingPage onNavigateToLogin={() => navigate('/login')} onNavigateToRegister={() => navigate('/register')} />} />
-        <Route path="/login" element={<LoginScreen onLogin={login} onSwitchToRegister={() => navigate('/register')} onBackToLanding={() => navigate('/')} />} />
-        <Route path="/register" element={<RegisterScreen onRegister={registerUser} onSwitchToLogin={() => navigate('/login')} onBackToLanding={() => navigate('/')} />} />
+        {/*Public routes */}
+        <Route element={<PublicOnlyRoute token={token} />}>
+          <Route path="/" element={<LandingPage onNavigateToLogin={() => navigate('/login')} onNavigateToRegister={() => navigate('/register')} />} />
+          <Route path="/login" element={<LoginScreen onLogin={login} onSwitchToRegister={() => navigate('/register')} onBackToLanding={() => navigate('/')} />} />
+          <Route path="/register" element={<RegisterScreen onRegister={registerUser} onSwitchToLogin={() => navigate('/login')} onBackToLanding={() => navigate('/')} />} />
+        </Route>
 
-        {/* --- Rotas Privadas (Protegidas) --- */}
+        {/*Protected routes */}
         <Route element={<ProtectedRoute token={token} />}>
           <Route path="/chat" element={<ChatScreen onLogout={logout} onNavigateToEditProfile={() => navigate('/profile')} />} />
           <Route path="/profile" element={<EditProfileScreen onLogout={logout} onNavigateToChat={() => navigate('/chat')} />} />
