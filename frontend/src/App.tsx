@@ -49,6 +49,7 @@ function App() {
         id: loadingToast,
       });
       setShowRegister(false); // switch to login screen after successful registration
+      setPublicView('login'); 
     } catch (error) {
       console.error("Falha no cadastro:", error);
       toast.error("Erro ao criar conta. Tente outro email.", {
