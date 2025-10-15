@@ -88,9 +88,18 @@ app.post("/message", auth, async (req, res) => {
     const message = await prisma.message.create({
         data: { content, userId },
     });
-    const reply = await prisma.message.create({ // Simulated AI reply
+    const aiResponses = [
+        "Interessante! Conte mais.",
+        "Não tenho certeza, mas parece legal!",
+        "Hmm, e se tentássemos outra abordagem?",
+        "Entendi parcialmente. Você pode explicar melhor?",
+        `Recebi sua mensagem: "${content}". O que faremos a seguir?` 
+    ];
+    const randomIndex = Math.floor(Math.random() * aiResponses.length);
+    const randomResponse = aiResponses[randomIndex];
+    const reply = await prisma.message.create({
         data: {
-            content: "Olá, sou a Liza! Você falou: " + content,
+            content: randomResponse, 
             fromIA: true,
             userId,
         },
