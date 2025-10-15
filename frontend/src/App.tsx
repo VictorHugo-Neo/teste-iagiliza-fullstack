@@ -1,5 +1,6 @@
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { Routes, Route, useNavigate, Navigate, Outlet } from 'react-router-dom';
 import { LoginScreen } from "./pages/LoginScreen"; // import login screen component
 import { RegisterScreen } from "./pages/RegisterScreen"; // import register screen component
 import { ChatScreen } from "./pages/ChatScreen"; // import chat screen component
@@ -13,12 +14,17 @@ type RegisterFormData = {
   password: string;
   confirmPassword: string;
 };
-
+const ProtectedRoute = ({ token }: { token: string | null }) => {
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />; // <Outlet /> renderiza o componente filho da rota (Chat ou Perfil)
+};
 function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("authToken")); // state to hold auth token
-   // state to toggle between login and register screens
-  const [activeScreen, setActiveScreen] = useState<'chat' | 'editProfile'>('chat');
-  const [publicView, setPublicView] = useState<'landing' | 'login' | 'register'>('landing');
+  const navigate = useNavigate();
+  // state to toggle between login and register screens
+  
 
   async function login(email: string, password: string) {
     try {
@@ -26,6 +32,8 @@ function App() {
       const receivedToken = res.data.token; // get token from response
       localStorage.setItem("authToken", receivedToken); // store token in local storage
       setToken(receivedToken);
+      navigate('/chat'); // navigate to chat screen
+      toast.success("Login bem-sucedido!");
     } catch (error) {
       // error handling
       console.error("Login failed", error);
@@ -34,7 +42,6 @@ function App() {
   }
   async function registerUser(data: RegisterFormData) {
     const loadingToast = toast.loading("Criando sua conta...");
-
     try {
       // Prepare data to send, excluding confirmPassword
       const submitData = {
@@ -48,8 +55,8 @@ function App() {
       toast.success("Cadastro realizado com sucesso! Faça o login.", {
         id: loadingToast,
       });
-      
-      setPublicView('login'); 
+
+      navigate('/login'); // navigate to login screen after successful registration
     } catch (error) {
       console.error("Falha no cadastro:", error);
       toast.error("Erro ao criar conta. Tente outro email.", {
@@ -63,46 +70,24 @@ function App() {
     localStorage.removeItem("authToken"); // remove token from local storage
     setToken(null); // clear token from state
     toast.success("Você foi desconectado.");
+    navigate('/'); // navigate to landing page
   }
 
   return (
     <>
-      {/* Toast notifications container */}
       <Toaster position="top-right" />
+      <Routes>
+        {/* --- Rotas Públicas --- */}
+        <Route path="/" element={<LandingPage onNavigateToLogin={() => navigate('/login')} onNavigateToRegister={() => navigate('/register')} />} />
+        <Route path="/login" element={<LoginScreen onLogin={login} onSwitchToRegister={() => navigate('/register')} onBackToLanding={() => navigate('/')} />} />
+        <Route path="/register" element={<RegisterScreen onRegister={registerUser} onSwitchToLogin={() => navigate('/login')} onBackToLanding={() => navigate('/')} />} />
 
-      {token ? (
-        // If token exists, show authenticated views
-        <>
-          {activeScreen === 'chat' && (
-            <ChatScreen onLogout={logout} onNavigateToEditProfile={() => setActiveScreen('editProfile')} />
-          )}
-          {activeScreen === 'editProfile' && (
-            <EditProfileScreen onLogout={logout} onNavigateToChat={() => setActiveScreen('chat')} />
-          )}
-        </>
-      ) : (
-        // If no token, show public views
-        <>
-          {publicView === 'landing' && (
-            <LandingPage 
-              onNavigateToLogin={() => setPublicView('login')}
-              onNavigateToRegister={() => setPublicView('register')}
-            />
-          )}
-          {publicView === 'login' && (
-            <LoginScreen 
-              onLogin={login}
-              onSwitchToRegister={() => setPublicView('register')}
-            />
-          )}
-          {publicView === 'register' && (
-            <RegisterScreen 
-              onRegister={registerUser}
-              onSwitchToLogin={() => setPublicView('login')}
-            />
-          )}
-        </>
-      )}
+        {/* --- Rotas Privadas (Protegidas) --- */}
+        <Route element={<ProtectedRoute token={token} />}>
+          <Route path="/chat" element={<ChatScreen onLogout={logout} onNavigateToEditProfile={() => navigate('/profile')} />} />
+          <Route path="/profile" element={<EditProfileScreen onLogout={logout} onNavigateToChat={() => navigate('/chat')} />} />
+        </Route>
+      </Routes>
     </>
   );
 }

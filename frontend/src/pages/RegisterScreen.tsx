@@ -26,7 +26,7 @@ interface RegisterScreenProps {
     onBackToLanding?: () => void; // Adicionar para a navegação completa
 }
 
-export function RegisterScreen({ onRegister, onSwitchToLogin, onBackToLanding }: RegisterScreenProps) {
+export function RegisterScreen({ onRegister, onSwitchToLogin}: RegisterScreenProps) {
 
     const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema)
@@ -44,11 +44,7 @@ export function RegisterScreen({ onRegister, onSwitchToLogin, onBackToLanding }:
             <Header variant="public-register" onNavigateToLogin={onSwitchToLogin} />
             <main className="flex-grow flex items-center justify-center p-4">
                 <div className="bg-secondary w-full max-w-md p-8 rounded-lg shadow-xl">
-                    {onBackToLanding && (
-                        <button type="button" onClick={onBackToLanding} className="text-light hover:underline mb-4">
-                            &larr; Voltar para a página inicial
-                        </button>
-                    )}
+
                     <h2 className="text-light text-3xl font-bold text-center mb-6">
                         CADASTRO
                     </h2>

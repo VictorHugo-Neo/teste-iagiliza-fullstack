@@ -9,7 +9,7 @@ interface LoginScreenProps {
     onBackToLanding?: () => void;
 }
 
-export function LoginScreen({ onLogin, onSwitchToRegister, onBackToLanding }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onSwitchToRegister}: LoginScreenProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -30,12 +30,6 @@ export function LoginScreen({ onLogin, onSwitchToRegister, onBackToLanding }: Lo
                     onSubmit={handleSubmit}
                     className="bg-secondary p-8 rounded-lg shadow-md w-full max-w-sm"
                 >
-                    {onBackToLanding && (
-                         <button type="button" onClick={onBackToLanding} className="text-light hover:underline mb-4">
-                            &larr; Voltar para a página inicial
-                         </button>
-                    )}
-
                     <h2 className="text-3xl font-bold text-light text-center mb-6">
                         LOGIN
                     </h2>
