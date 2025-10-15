@@ -16,10 +16,10 @@ type RegisterFormData = {
 
 function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("authToken")); // state to hold auth token
-  const [showRegister, setShowRegister] = useState(false); // state to toggle between login and register screens
+   // state to toggle between login and register screens
   const [activeScreen, setActiveScreen] = useState<'chat' | 'editProfile'>('chat');
-  
   const [publicView, setPublicView] = useState<'landing' | 'login' | 'register'>('landing');
+
   async function login(email: string, password: string) {
     try {
       const res = await api.post("/login", { email, password });
@@ -48,7 +48,7 @@ function App() {
       toast.success("Cadastro realizado com sucesso! Faça o login.", {
         id: loadingToast,
       });
-      setShowRegister(false); // switch to login screen after successful registration
+      
       setPublicView('login'); 
     } catch (error) {
       console.error("Falha no cadastro:", error);
@@ -71,8 +71,7 @@ function App() {
       <Toaster position="top-right" />
 
       {token ? (
-        // --- SE O USUÁRIO ESTÁ LOGADO, mostra a área privada ---
-        // Esta parte não muda.
+        // If token exists, show authenticated views
         <>
           {activeScreen === 'chat' && (
             <ChatScreen onLogout={logout} onNavigateToEditProfile={() => setActiveScreen('editProfile')} />
@@ -82,8 +81,7 @@ function App() {
           )}
         </>
       ) : (
-        // --- SE O USUÁRIO NÃO ESTÁ LOGADO, mostra a área pública ---
-        // 3. Esta é a nova lógica de navegação pública
+        // If no token, show public views
         <>
           {publicView === 'landing' && (
             <LandingPage 

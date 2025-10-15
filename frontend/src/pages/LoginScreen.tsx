@@ -60,11 +60,11 @@ export function LoginScreen({ onLogin, onSwitchToRegister }: LoginScreenProps) {
                     >
                         ENTRAR
                     </button>
-                    <p>Não tem uma conta?
+                    <p>Não tem uma conta? 
                         <button
                             type="button"
                             onClick={onSwitchToRegister} // Switch to registration screen
-                            className="text-primary hover:underline"
+                            className="text-light hover:underline hover:font-bold"
                         >
                             Cadastre-se
                         </button>
