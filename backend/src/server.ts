@@ -75,8 +75,6 @@ app.get("/messages", auth, async (req, res) => {
     });
     res.json(messages);
 });
-
-
 // Post a new message and get an automated reply
 app.post("/message", auth, async (req, res) => {
     const { content } = req.body;
@@ -106,5 +104,72 @@ app.post("/message", auth, async (req, res) => {
     });
     res.status(201).json({ message, reply });
 });
+// Get current user info
+app.get("/me", auth, async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: { id: req.userId },
+    select: { id: true, name: true, email: true }, // exclude password
+  });
 
+  if (!user) {
+    return res.status(404).json({ message: "Usuário não encontrado." });
+  }
+
+  res.json(user);
+});
+// Update user info email and name
+app.put("/user", auth, async (req, res) => {
+  const schema = z.object({
+    name: z.string().min(3).optional(),
+    email: z.string().email().optional(),
+  });
+
+  try {
+    const data = schema.parse(req.body);
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "Nenhum dado para atualizar." });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: req.userId },
+      data: data,
+      select: { id: true, name: true, email: true },
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ message: "Dados inválidos." });
+  }
+});
+// Change user password
+app.put("/user/password", auth, async (req, res) => {
+  const schema = z.object({
+    currentPassword: z.string(),
+    newPassword: z.string().min(6),
+  });
+
+  try {
+    const { currentPassword, newPassword } = schema.parse(req.body);
+
+    const user = await prisma.user.findUnique({ where: { id: req.userId } });
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado." });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ message: "Senha atual incorreta." });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: req.userId },
+      data: { password: hashedNewPassword },
+    });
+
+    res.status(200).json({ message: "Senha alterada com sucesso." });
+  } catch (error) {
+    res.status(400).json({ message: "Dados inválidos." });
+  }
+});
 app.listen(4000, () => console.log("Servidor rodando na porta 4000"));
