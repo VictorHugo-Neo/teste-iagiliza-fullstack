@@ -3,6 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { LoginScreen } from "./pages/LoginScreen"; // import login screen component
 import { RegisterScreen } from "./pages/RegisterScreen"; // import register screen component
 import { ChatScreen } from "./pages/ChatScreen"; // import chat screen component
+import { EditProfileScreen } from './pages/EditProfileScreen';
 import { api } from "./services/api";
 
 type RegisterFormData = {
@@ -15,7 +16,7 @@ type RegisterFormData = {
 function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("authToken")); // state to hold auth token
   const [showRegister, setShowRegister] = useState(false); // state to toggle between login and register screens
-
+  const [activeScreen, setActiveScreen] = useState<'chat' | 'editProfile'>('chat');
   async function login(email: string, password: string) {
     try {
       const res = await api.post("/login", { email, password });
@@ -61,10 +62,26 @@ function App() {
   }
 
   if (token) {
-    // if token exists, user is logged in, so render the ChatScreen
-    return <ChatScreen onLogout={logout} />;
+    // Se o usuário estiver logado, decidimos qual tela mostrar
+    return (
+      <>
+        {activeScreen === 'chat' && (
+          <ChatScreen 
+            onLogout={logout} 
+            // Passamos uma função para mudar o estado para 'editProfile'
+            onNavigateToEditProfile={() => setActiveScreen('editProfile')} 
+          />
+        )}
+        {activeScreen === 'editProfile' && (
+          <EditProfileScreen 
+            onLogout={logout} 
+            // Passamos uma função para mudar o estado de volta para 'chat'
+            onNavigateToChat={() => setActiveScreen('chat')}
+          />
+        )}
+      </>
+    )
   }
-
   return (
     <>
       <Toaster position="top-right" />
